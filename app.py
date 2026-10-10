@@ -449,15 +449,22 @@ st.markdown(f"""
     }}
     
     .engine-status-chip {{
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: var(--surface-main);
-        border: 1px solid var(--border-subtle);
-        padding: 4px 12px;
-        border-radius: 6px;
-        font-size: 0.74rem;
-        color: var(--text-secondary);
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        background: var(--surface-main) !important;
+        border: 1px solid var(--border-subtle) !important;
+        padding: 0 12px !important;
+        border-radius: 7px !important;
+        font-size: 0.76rem !important;
+        color: var(--text-secondary) !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        max-height: 36px !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        line-height: 1 !important;
     }}
     .status-dot-green {{
         width: 6.5px;
@@ -792,21 +799,26 @@ st.markdown(f"""
 
     /* Top Bar User Badge & Auth Styles */
     .topbar-user-badge {{
-        background: rgba(244, 63, 94, 0.12);
-        border: 1px solid rgba(244, 63, 94, 0.35);
-        color: var(--text-main);
-        padding: 5px 12px;
-        border-radius: 8px;
-        font-size: 0.82rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        height: 38px;
-        box-sizing: border-box;
+        background: rgba(244, 63, 94, 0.12) !important;
+        border: 1px solid rgba(244, 63, 94, 0.35) !important;
+        color: var(--text-main) !important;
+        padding: 0 14px !important;
+        border-radius: 7px !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        max-height: 36px !important;
+        line-height: 1 !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
     }}
     
     .user-greeting-chip {{
@@ -864,6 +876,42 @@ st.markdown(f"""
         padding-right: 38px !important;
     }}
 
+    /* Topbar Layout & Straight Line Alignment */
+    div[data-testid="stHorizontalBlock"]:has(#top-logout-anchor),
+    div[data-testid="stHorizontalBlock"]:has(#top-login-anchor) {{
+        align-items: center !important;
+    }}
+    div[data-testid="stHorizontalBlock"]:has(#top-logout-anchor) > div,
+    div[data-testid="stHorizontalBlock"]:has(#top-login-anchor) > div {{
+        display: flex !important;
+        align-items: center !important;
+    }}
+    div[data-testid="stHorizontalBlock"]:has(#top-logout-anchor) div[data-testid="stVerticalBlock"],
+    div[data-testid="stHorizontalBlock"]:has(#top-login-anchor) div[data-testid="stVerticalBlock"] {{
+        display: flex !important;
+        align-items: center !important;
+        gap: 0 !important;
+        width: 100% !important;
+    }}
+    div[data-testid="element-container"]:has(#top-logout-anchor),
+    div[data-testid="element-container"]:has(#top-login-anchor),
+    .element-container:has(#top-logout-anchor),
+    .element-container:has(#top-login-anchor) {{
+        display: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 0 !important;
+        width: 0 !important;
+    }}
+    div[data-testid="stHorizontalBlock"]:has(#top-logout-anchor) .stButton,
+    div[data-testid="stHorizontalBlock"]:has(#top-login-anchor) .stButton {{
+        margin: 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+    }}
+
     /* Compact Green Login Button (Top Right) */
     div[data-testid="column"]:has(#top-login-anchor) .stButton > button,
     div[data-testid="stColumn"]:has(#top-login-anchor) .stButton > button {{
@@ -874,9 +922,10 @@ st.markdown(f"""
         padding: 0 16px !important;
         font-size: 0.80rem !important;
         font-weight: 600 !important;
-        min-height: 34px !important;
-        height: 34px !important;
-        line-height: 34px !important;
+        min-height: 36px !important;
+        height: 36px !important;
+        max-height: 36px !important;
+        line-height: 36px !important;
         box-shadow: 0 2px 10px rgba(16, 185, 129, 0.32) !important;
         transition: all 0.18s ease !important;
         white-space: nowrap !important;
@@ -884,6 +933,8 @@ st.markdown(f"""
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
     }}
     div[data-testid="column"]:has(#top-login-anchor) .stButton > button:hover,
     div[data-testid="stColumn"]:has(#top-login-anchor) .stButton > button:hover {{
@@ -913,9 +964,10 @@ st.markdown(f"""
         padding: 0 16px !important;
         font-size: 0.80rem !important;
         font-weight: 600 !important;
-        min-height: 34px !important;
-        height: 34px !important;
-        line-height: 34px !important;
+        min-height: 36px !important;
+        height: 36px !important;
+        max-height: 36px !important;
+        line-height: 36px !important;
         box-shadow: none !important;
         white-space: nowrap !important;
         display: inline-flex !important;
@@ -923,6 +975,8 @@ st.markdown(f"""
         justify-content: center !important;
         gap: 6px !important;
         width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
         overflow: visible !important;
     }}
     div[data-testid="column"]:has(#top-logout-anchor) .stButton > button:hover,
@@ -1188,23 +1242,25 @@ with st.sidebar:
 # ==============================================================================
 # TOP BAR WITH AUTHENTICATION
 # ==============================================================================
-col_tb_left, col_tb_right = st.columns([2.2, 2.0])
+col_tb_left, col_tb_right = st.columns([1.5, 2.5])
 
 with col_tb_left:
     st.markdown(f"""
-    <div style="padding: 6px 0;">
+    <div style="padding: 8px 0;">
         <span class="breadcrumb-text">Workspace / <span class="breadcrumb-active">{st.session_state.workspace_view}</span></span>
     </div>
     """, unsafe_allow_html=True)
 
 with col_tb_right:
     if not st.session_state.get("is_logged_in", False):
-        col_t_chip, col_t_login = st.columns([1.4, 1.0])
-        with col_t_chip:
+        col_t_info, col_t_login = st.columns([2.0, 1.0])
+        with col_t_info:
             st.markdown("""
-            <div class="engine-status-chip">
-                <span class="status-dot-green"></span>
-                <span>Dual-Engine Online</span>
+            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; height: 36px;">
+                <div class="engine-status-chip">
+                    <span class="status-dot-green"></span>
+                    <span>Dual-Engine Online</span>
+                </div>
             </div>
             """, unsafe_allow_html=True)
         with col_t_login:
@@ -1214,22 +1270,21 @@ with col_tb_right:
                 st.session_state.workspace_view = "🔑 Login / Account"
                 st.rerun()
     else:
-        col_t_chip, col_t_user, col_t_logout = st.columns([1.25, 1.35, 1.1])
-        with col_t_chip:
-            st.markdown("""
-            <div class="engine-status-chip">
-                <span class="status-dot-green"></span>
-                <span>Dual-Engine Online</span>
-            </div>
-            """, unsafe_allow_html=True)
-        with col_t_user:
+        col_t_info, col_t_logout = st.columns([2.6, 1.0])
+        with col_t_info:
             display_name = st.session_state.user_name or st.session_state.username
             if len(display_name) > 16:
                 display_name = display_name[:14] + "…"
             st.markdown(f"""
-            <div class="topbar-user-badge" title="Signed in as {st.session_state.user_name} (@{st.session_state.username})">
-                <span style="font-size: 0.95rem;">👤</span>
-                <span style="font-weight: 600; font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{display_name}</span>
+            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; height: 36px;">
+                <div class="engine-status-chip">
+                    <span class="status-dot-green"></span>
+                    <span>Dual-Engine Online</span>
+                </div>
+                <div class="topbar-user-badge" title="Signed in as {st.session_state.user_name} (@{st.session_state.username})">
+                    <span>👤</span>
+                    <span style="font-weight: 600; font-size: 0.82rem; white-space: nowrap;">{display_name}</span>
+                </div>
             </div>
             """, unsafe_allow_html=True)
         with col_t_logout:
