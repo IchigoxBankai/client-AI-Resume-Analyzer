@@ -1,0 +1,43 @@
+ALEX MORGAN
+Email: alex.morgan.dev@gmail.com | Phone: +1-555-019-2834
+LinkedIn: https://linkedin.com/in/alexmorgan-dev | GitHub: https://github.com/alexmorgan-dev
+Portfolio: alexmorgan.dev | Location: San Francisco, CA
+
+PROFESSIONAL SUMMARY
+Dynamic and results-driven Full-Stack Software Engineer with 2+ years of hands-on experience in building high-performance web applications, microservices, and REST APIs. Proficient in Python, React, TypeScript, FastAPI, PostgreSQL, and Docker. Passionate about scalable architecture and writing clean, test-driven code.
+
+TECHNICAL SKILLS
+• Programming Languages: Python, JavaScript, TypeScript, SQL, HTML5, CSS3, C++
+• Frontend: React, Next.js, Redux Toolkit, Tailwind CSS, Bootstrap
+• Backend & APIs: FastAPI, Django, Node.js, Express, REST API, GraphQL
+• Databases: PostgreSQL, MongoDB, Redis, SQLite
+• Cloud & DevOps: Docker, AWS (EC2, S3), Git, GitHub Actions, CI/CD, Linux
+• Methodologies & Tools: Agile, Scrum, Postman, PyTest, Jest, Jira
+
+PROFESSIONAL EXPERIENCE
+Full-Stack Developer Intern | CloudTech Solutions (June 2023 - Present)
+• Engineered and deployed scalable microservices using Python FastAPI and PostgreSQL, reducing query latency by 42%.
+• Built dynamic, responsive user interfaces with React and Tailwind CSS, improving user engagement by 28%.
+• Automated continuous integration and deployment pipelines using GitHub Actions and Docker, cutting deployment cycle times by 65%.
+• Architected Redis caching layer handling 50,000+ daily requests with 99.9% uptime.
+• Collaborated in an agile scrum team of 8 engineers, participating in bi-weekly sprints and daily standups.
+
+ACADEMIC PROJECTS
+1. ResuMetric AI - Intelligent Career & ATS Analyzer
+• Developed an NLP-driven resume parsing and job description matching system using Python, Scikit-Learn (TF-IDF), and Streamlit.
+• Implemented cosine similarity algorithms to calculate match scores and detect missing skill gaps with 94% accuracy.
+• Integrated Google Gemini Generative AI for automated STAR-method resume bullet point rewriting.
+
+2. Distributed E-Commerce Microservices Platform
+• Designed a full-stack e-commerce application using React, Node.js, Express, and MongoDB.
+• Implemented secure JWT authentication and integrated Stripe payment gateway handling 500+ test transactions.
+
+EDUCATION
+Bachelor of Science in Computer Science (BSc CS)
+ABC University of Technology (2021 - 2024) | GPA: 3.85 / 4.0
+Relevant Coursework: Data Structures & Algorithms, Database Management Systems (DBMS), Operating Systems, Software Engineering, Object-Oriented Programming (OOP).
+
+CERTIFICATIONS & ACHIEVEMENTS
+• AWS Certified Cloud Practitioner
+• Meta Frontend Developer Professional Certificate
+• 1st Place - University Hackathon 2023 (Developed an AI Medical Triage Assistant)
