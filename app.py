@@ -1,5 +1,5 @@
 """
-ResuMetric AI — Next-Gen AI Resume Analyzer & Career Intelligence Suite
+AI Resume Analyzer — Next-Gen AI Resume Analyzer & Career Intelligence Suite
 Final-Year BSc Computer Science Academic Project Submission
 Complete Platform Upgrade: Version Lab, AI Studio, Interview Room, & History
 """
@@ -36,7 +36,8 @@ from core.history_manager import (
 )
 from core.version_comparator import compare_resume_versions
 from core.auth_manager import (
-    register_user, authenticate_user, get_user_profile
+    register_user, authenticate_user, get_user_profile,
+    create_user_session, verify_user_session, destroy_user_session
 )
 
 
@@ -44,7 +45,7 @@ from core.auth_manager import (
 # STREAMLIT PAGE CONFIGURATION
 # ==============================================================================
 st.set_page_config(
-    page_title="ResuMetric AI — Career Intelligence Suite",
+    page_title="AI Resume Analyzer — Career Intelligence Suite",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -67,6 +68,9 @@ if "active_file_name" not in st.session_state:
     st.session_state.active_file_name = ""
 
 # Authentication session state
+if "session_token" not in st.session_state:
+    st.session_state.session_token = ""
+
 if "is_logged_in" not in st.session_state:
     st.session_state.is_logged_in = False
 
@@ -75,6 +79,20 @@ if "user_name" not in st.session_state:
 
 if "username" not in st.session_state:
     st.session_state.username = ""
+
+# Auto-restore user authentication across browser reloads
+if not st.session_state.get("is_logged_in", False):
+    token_in_url = st.query_params.get("session")
+    if token_in_url:
+        u_profile = verify_user_session(token_in_url)
+        if u_profile:
+            st.session_state.is_logged_in = True
+            st.session_state.user_name = u_profile.get("name", "")
+            st.session_state.username = u_profile.get("username", "")
+            st.session_state.session_token = token_in_url
+        else:
+            if "session" in st.query_params:
+                del st.query_params["session"]
 
 if "auth_notice" not in st.session_state:
     st.session_state.auth_notice = ""
@@ -743,6 +761,23 @@ st.markdown(f"""
         line-height: 1.45;
     }}
 
+    /* Enhanced Textarea Styling for comfortable reading without scrolling */
+    div[data-testid="stTextArea"] textarea {{
+        font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, Menlo, monospace !important;
+        font-size: 0.84rem !important;
+        line-height: 1.6 !important;
+        background-color: var(--surface-card) !important;
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-subtle) !important;
+        border-radius: 10px !important;
+        padding: 14px 16px !important;
+        resize: vertical !important;
+    }}
+    div[data-testid="stTextArea"] textarea:focus {{
+        border-color: var(--color-primary) !important;
+        box-shadow: 0 0 0 2px rgba(244, 63, 94, 0.2) !important;
+    }}
+
     .stTabs [data-baseweb="tab-list"] {{
         gap: 6px;
         background-color: var(--surface-main);
@@ -932,9 +967,12 @@ st.markdown(f"""
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
-        width: 100% !important;
+        width: auto !important;
+        min-width: 85px !important;
+        max-width: 100px !important;
         box-sizing: border-box !important;
-        margin: 0 !important;
+        margin-top: 17px !important;
+        margin-bottom: 0 !important;
     }}
     div[data-testid="column"]:has(#top-login-anchor) .stButton > button:hover,
     div[data-testid="stColumn"]:has(#top-login-anchor) .stButton > button:hover {{
@@ -974,9 +1012,12 @@ st.markdown(f"""
         align-items: center !important;
         justify-content: center !important;
         gap: 6px !important;
-        width: 100% !important;
+        width: auto !important;
+        min-width: 88px !important;
+        max-width: 105px !important;
         box-sizing: border-box !important;
-        margin: 0 !important;
+        margin-top: 17px !important;
+        margin-bottom: 0 !important;
         overflow: visible !important;
     }}
     div[data-testid="column"]:has(#top-logout-anchor) .stButton > button:hover,
@@ -1064,7 +1105,7 @@ with st.sidebar:
         <div class="brand-container">
             <div class="brand-logo">⚡</div>
             <div>
-                <div class="brand-title">ResuMetric AI</div>
+                <div class="brand-title">AI Resume Analyzer</div>
                 <div class="brand-subtitle">RESUME INTELLIGENCE</div>
             </div>
         </div>
@@ -1085,13 +1126,14 @@ with st.sidebar:
     
     # User Profile / Greeting Chip
     if st.session_state.get("is_logged_in", False):
+        user_handle = st.session_state.username if ("@" in st.session_state.username) else f"@{st.session_state.username}"
         st.markdown(f"""
             <div class="user-greeting-chip">
                 <span style="font-size: 1.15rem;">👤</span>
                 <div style="overflow: hidden;">
                     <div style="font-size: 0.62rem; color: #FB7185; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">AUTHENTICATED USER</div>
                     <div style="font-size: 0.86rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{st.session_state.user_name}</div>
-                    <div style="font-size: 0.70rem; color: var(--text-secondary);">@{st.session_state.username}</div>
+                    <div style="font-size: 0.70rem; color: var(--text-secondary);">{user_handle}</div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -1253,7 +1295,7 @@ with col_tb_left:
 
 with col_tb_right:
     if not st.session_state.get("is_logged_in", False):
-        col_t_info, col_t_login = st.columns([2.0, 1.0])
+        col_t_info, col_t_login = st.columns([2.8, 0.7])
         with col_t_info:
             st.markdown("""
             <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; height: 36px;">
@@ -1265,23 +1307,24 @@ with col_tb_right:
             """, unsafe_allow_html=True)
         with col_t_login:
             st.markdown('<span id="top-login-anchor" style="display:none;"></span>', unsafe_allow_html=True)
-            if st.button("🔑 Login", key="top_login_btn", use_container_width=True):
+            if st.button("🔑 Login", key="top_login_btn"):
                 st.session_state.auth_notice = ""
                 st.session_state.workspace_view = "🔑 Login / Account"
                 st.rerun()
     else:
-        col_t_info, col_t_logout = st.columns([2.6, 1.0])
+        col_t_info, col_t_logout = st.columns([3.3, 0.7])
         with col_t_info:
             display_name = st.session_state.user_name or st.session_state.username
             if len(display_name) > 16:
                 display_name = display_name[:14] + "…"
+            user_handle = st.session_state.username if ("@" in st.session_state.username) else f"@{st.session_state.username}"
             st.markdown(f"""
             <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; height: 36px;">
                 <div class="engine-status-chip">
                     <span class="status-dot-green"></span>
                     <span>Dual-Engine Online</span>
                 </div>
-                <div class="topbar-user-badge" title="Signed in as {st.session_state.user_name} (@{st.session_state.username})">
+                <div class="topbar-user-badge" title="Signed in as {st.session_state.user_name} ({user_handle})">
                     <span>👤</span>
                     <span style="font-weight: 600; font-size: 0.82rem; white-space: nowrap;">{display_name}</span>
                 </div>
@@ -1289,10 +1332,15 @@ with col_tb_right:
             """, unsafe_allow_html=True)
         with col_t_logout:
             st.markdown('<span id="top-logout-anchor" style="display:none;"></span>', unsafe_allow_html=True)
-            if st.button("🚪 Logout", use_container_width=True, key="top_logout_btn"):
+            if st.button("🚪 Logout", key="top_logout_btn"):
+                if st.session_state.get("session_token"):
+                    destroy_user_session(st.session_state.session_token)
                 st.session_state.is_logged_in = False
                 st.session_state.user_name = ""
                 st.session_state.username = ""
+                st.session_state.session_token = ""
+                if "session" in st.query_params:
+                    del st.query_params["session"]
                 st.rerun()
 
 st.markdown('<div style="border-bottom: 1px solid var(--border-subtle); margin-bottom: 14px;"></div>', unsafe_allow_html=True)
@@ -1534,11 +1582,10 @@ if st.session_state.workspace_view == "📑 Resume Analyzer":
     # Tabs Dashboard
     tabs = st.tabs([
         "📊 ATS Scorecard & Breakdown",
-        "🎯 Skill Gap & Roadmaps",
+        "🎯 Identified Skills by Domain",
         "✍️ STAR Bullet Health",
         "💼 Career Role Compatibility",
-        "📄 Audit Summary & PDF Export",
-        "⚙️ Engine & API Settings"
+        "📄 Audit Summary & PDF Export"
     ])
 
     with tabs[0]:
@@ -1600,30 +1647,24 @@ if st.session_state.workspace_view == "📑 Resume Analyzer":
                 st.markdown(f"⚠️ **Action Item:** {imp}")
 
     with tabs[1]:
-        col_sk1, col_sk2 = st.columns([1, 1], gap="medium")
-        with col_sk1:
-            st.subheader("📚 Identified Skills by Domain")
+        col_sk_l, col_sk_c, col_sk_r = st.columns([1, 3.2, 1])
+        with col_sk_c:
+            st.markdown("""
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="margin-bottom: 6px; font-weight: 800; color: var(--text-main);">📑 Identified Skills by Domain</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">
+                    Categorized overview of technical capabilities detected across your resume.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
             categorized = ats_results["skills_data"]["categorized_resume_skills"]
             if categorized:
                 for cat_name, skill_list in categorized.items():
                     with st.expander(f"🔹 {cat_name} ({len(skill_list)})", expanded=True):
                         badges_html = "".join([f'<span class="skill-tag tag-neutral">{s.title()}</span>' for s in skill_list])
-                        st.markdown(f'<div>{badges_html}</div>', unsafe_allow_html=True)
-        with col_sk2:
-            st.subheader("🚀 Curated Free Learning Roadmaps")
-            roadmaps = ats_results.get("learning_recommendations", [])
-            if roadmaps:
-                for rm in roadmaps:
-                    st.markdown(f"""
-                    <div class="app-card" style="margin-bottom: 10px; padding: 14px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-weight: 600; color: #FB7185; font-size: 0.92rem;">{rm['title']}</span>
-                            <span class="skill-tag tag-missing">Missing: {rm['skill']}</span>
-                        </div>
-                        <p style="margin: 6px 0 8px 0; font-size: 0.80rem; color: var(--text-secondary);">{rm['description']}</p>
-                        <a href="{rm['link']}" target="_blank" style="color: #38BDF8; font-size: 0.78rem; text-decoration: none; font-weight: 600;">Explore Official Curriculum →</a>
-                    </div>
-                    """, unsafe_allow_html=True)
+                        st.markdown(f'<div style="line-height: 2.2;">{badges_html}</div>', unsafe_allow_html=True)
+            else:
+                st.info("No categorized skills detected in the resume text.")
 
     with tabs[2]:
         st.markdown("### 📋 Detected Bullet Points & Action Verb Health")
@@ -1698,27 +1739,8 @@ if st.session_state.workspace_view == "📑 Resume Analyzer":
         with col_p2:
             st.subheader("📥 Export Official ATS Audit Report (PDF)")
             pdf_bytes = generate_pdf_report(candidate_name=candidate_name, contacts=contact_data, stats=stats_data, ats_results=ats_results, role_fits=role_fits)
-            st.download_button(label="⬇️ Download ATS Audit Report (PDF)", data=pdf_bytes, file_name=f"ResuMetric_Audit_Report_{candidate_name.replace(' ', '_')}.pdf", mime="application/pdf", type="primary", use_container_width=True)
+            st.download_button(label="⬇️ Download ATS Audit Report (PDF)", data=pdf_bytes, file_name=f"AI_Resume_Analyzer_Audit_Report_{candidate_name.replace(' ', '_')}.pdf", mime="application/pdf", type="primary", use_container_width=True)
 
-    with tabs[5]:
-        col_s1, col_s2 = st.columns([1, 1], gap="medium")
-        with col_s1:
-            st.markdown("""<div class="app-card">
-<h4 style="margin-top:0; color:#FB7185;">🤖 Generative AI (LLM) Integration</h4>
-<p style="font-size:0.80rem; color:var(--text-secondary);">Optional: Enter a free Google Gemini API Key to enable advanced LLM generative suggestions. Leave empty for 100% offline local NLP.</p>
-</div>""", unsafe_allow_html=True)
-            new_key = st.text_input("Google Gemini API Key:", value=st.session_state.gemini_api_key, type="password", placeholder="AIzaSy...")
-            if new_key != st.session_state.gemini_api_key:
-                st.session_state.gemini_api_key = new_key
-                st.success("API Key updated in session!")
-        with col_s2:
-            st.markdown("""<div class="app-card">
-<h4 style="margin-top:0; color:#38BDF8;">🧠 Dual-Engine Architecture Explained</h4>
-<ul style="font-size:0.80rem; color:var(--text-secondary); line-height:1.55; padding-left:16px;">
-<li><b>Primary Engine:</b> Scikit-Learn TF-IDF, Cosine Similarity, Regex Rules (Runs 100% offline).</li>
-<li><b>Generative Extension:</b> Google Gemini-1.5-Flash (Activated when key provided).</li>
-</ul>
-</div>""", unsafe_allow_html=True)
 
 
 # ------------------------------------------------------------------------------
@@ -1734,35 +1756,58 @@ elif st.session_state.workspace_view == "🔬 Resume Version Lab":
     </div>
     """, unsafe_allow_html=True)
 
+    col_upload_b, col_sync = st.columns([3, 1])
+    with col_upload_b:
+        with st.expander("📂 Optional: Upload Version B Document (.pdf, .docx, .txt)", expanded=False):
+            if not st.session_state.get("is_logged_in", False):
+                st.info("🔒 Login required to upload files. You can type, paste, or modify Version B directly in the editor below.")
+            else:
+                v_b_upload = st.file_uploader("Upload updated resume to compare against Version A:", type=["pdf", "docx", "txt"], key="lab_upload_b")
+                if v_b_upload is not None:
+                    vb_bytes = v_b_upload.read()
+                    if v_b_upload.name.endswith(".pdf"): text_v_b_loaded = extract_text_from_pdf(vb_bytes)
+                    elif v_b_upload.name.endswith(".docx"): text_v_b_loaded = extract_text_from_docx(vb_bytes)
+                    else: text_v_b_loaded = extract_text_from_txt(vb_bytes)
+                    if text_v_b_loaded:
+                        st.session_state.lab_text_b = text_v_b_loaded
+                        st.success(f"✓ Loaded '{v_b_upload.name}' into Version B editor!")
+    with col_sync:
+        if st.button("📋 Reset from Version A", use_container_width=True):
+            st.session_state.lab_text_b = st.session_state.active_resume_text
+            st.rerun()
+
     col_v1, col_v2 = st.columns([1, 1], gap="large")
     
     with col_v1:
-        st.markdown("""<div class="app-card">
-<h4 style="margin:0 0 8px 0; color:#FB7185;">📌 Version A (Original Resume)</h4>
-</div>""", unsafe_allow_html=True)
-        text_v_a = st.text_area("Version A Content:", value=st.session_state.active_resume_text, height=220, key="lab_text_a")
+        st.markdown("""
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-weight: 700; color: #FB7185; font-size: 0.95rem;">📌 Version A (Original Baseline)</div>
+            <span style="font-size: 0.72rem; color: var(--text-secondary); background: var(--surface-card); padding: 3px 8px; border-radius: 6px; border: 1px solid var(--border-subtle);">Active Resume</span>
+        </div>
+        """, unsafe_allow_html=True)
+        text_v_a = st.text_area(
+            "Version A Content",
+            value=st.session_state.active_resume_text,
+            height=460,
+            key="lab_text_a",
+            label_visibility="collapsed"
+        )
         
     with col_v2:
-        st.markdown("""<div class="app-card">
-<h4 style="margin:0 0 8px 0; color:#29D9A0;">🚀 Version B (Updated Resume)</h4>
-</div>""", unsafe_allow_html=True)
-        if not st.session_state.get("is_logged_in", False):
-            st.markdown("""
-            <div style="background: rgba(244, 63, 94, 0.08); border: 1px dashed rgba(244, 63, 94, 0.3); border-radius: 8px; padding: 10px; margin-bottom: 8px; text-align: center;">
-                <span style="font-size: 0.78rem; color: var(--text-secondary);">🔒 <b>Login required to upload files.</b> You can edit text directly below.</span>
-            </div>
-            """, unsafe_allow_html=True)
-            v_b_upload = None
-        else:
-            v_b_upload = st.file_uploader("Upload Version B (.pdf, .docx, .txt):", type=["pdf", "docx", "txt"], key="lab_upload_b")
-        text_v_b_initial = ""
-        if v_b_upload is not None:
-            vb_bytes = v_b_upload.read()
-            if v_b_upload.name.endswith(".pdf"): text_v_b_initial = extract_text_from_pdf(vb_bytes)
-            elif v_b_upload.name.endswith(".docx"): text_v_b_initial = extract_text_from_docx(vb_bytes)
-            else: text_v_b_initial = extract_text_from_txt(vb_bytes)
-            
-        text_v_b = st.text_area("Version B Content (or edit below):", value=text_v_b_initial or text_v_a, height=140, key="lab_text_b")
+        st.markdown("""
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-weight: 700; color: #29D9A0; font-size: 0.95rem;">🚀 Version B (Target Iteration)</div>
+            <span style="font-size: 0.72rem; color: #29D9A0; background: rgba(41, 217, 160, 0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(41, 217, 160, 0.25);">Editable Draft</span>
+        </div>
+        """, unsafe_allow_html=True)
+        initial_b = st.session_state.get("lab_text_b", st.session_state.active_resume_text)
+        text_v_b = st.text_area(
+            "Version B Content",
+            value=initial_b,
+            height=460,
+            key="lab_text_b",
+            label_visibility="collapsed"
+        )
 
     if st.button("🔬 Execute Side-by-Side Version Comparison", type="primary", use_container_width=True):
         if not text_v_a.strip() or not text_v_b.strip():
@@ -2141,7 +2186,7 @@ elif st.session_state.workspace_view == "🔑 Login / Account":
             <div class="auth-card-wrapper">
                 <div class="auth-avatar-banner">⚡</div>
                 <h2 style="text-align: center; font-size: 1.35rem; font-weight: 800; margin-bottom: 4px; color: var(--text-main);">
-                    Welcome to ResuMetric AI
+                    Welcome to AI Resume Analyzer
                 </h2>
                 <p style="text-align: center; font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 20px;">
                     Enter your name and credentials to get started
@@ -2154,9 +2199,9 @@ elif st.session_state.workspace_view == "🔑 Login / Account":
             with auth_tab_login:
                 st.markdown("<p style='font-size:0.84rem; color:var(--text-secondary); margin-top:8px;'>Enter your registered username and password to log in.</p>", unsafe_allow_html=True)
                 with st.form("login_form", clear_on_submit=False):
-                    login_user = st.text_input("Username", placeholder="e.g. alexmorgan", key="input_login_username")
+                    login_user = st.text_input("Username", placeholder="e.g. alexmorgan, @alex, or alex@email.com", key="input_login_username")
                     login_pass = st.text_input("Password", type="password", placeholder="••••••••", key="input_login_password")
-                    btn_submit_login = st.form_submit_button("Sign In to ResuMetric AI", type="primary", use_container_width=True)
+                    btn_submit_login = st.form_submit_button("Sign In to AI Resume Analyzer", type="primary", use_container_width=True)
                     
                     if btn_submit_login:
                         if not login_user or not login_pass:
@@ -2164,7 +2209,10 @@ elif st.session_state.workspace_view == "🔑 Login / Account":
                         else:
                             success, msg, user_obj = authenticate_user(login_user, login_pass)
                             if success and user_obj:
+                                sess_token = create_user_session(user_obj.get("username", login_user))
+                                st.query_params["session"] = sess_token
                                 st.session_state.is_logged_in = True
+                                st.session_state.session_token = sess_token
                                 st.session_state.user_name = user_obj.get("name", login_user)
                                 st.session_state.username = user_obj.get("username", login_user)
                                 st.session_state.workspace_view = "📑 Resume Analyzer"
@@ -2177,7 +2225,7 @@ elif st.session_state.workspace_view == "🔑 Login / Account":
                 st.markdown("<p style='font-size:0.84rem; color:var(--text-secondary); margin-top:8px;'>Create your account. Your name will be displayed in the app and on generated reports.</p>", unsafe_allow_html=True)
                 with st.form("register_form", clear_on_submit=False):
                     reg_name = st.text_input("Full Name", placeholder="e.g. Alex Morgan", help="This name will appear on the top right, in greetings, and on ATS audit reports.")
-                    reg_user = st.text_input("Username", placeholder="e.g. alexmorgan (letters, numbers, underscores)")
+                    reg_user = st.text_input("Username", placeholder="e.g. alexmorgan, @alex, or alex@email.com (letters, numbers, @, ., _, -)")
                     reg_pass = st.text_input("Password", type="password", placeholder="At least 4 characters")
                     reg_confirm = st.text_input("Confirm Password", type="password", placeholder="Re-enter password")
                     btn_submit_reg = st.form_submit_button("Create Account & Sign In", type="primary", use_container_width=True)
@@ -2190,7 +2238,10 @@ elif st.session_state.workspace_view == "🔑 Login / Account":
                         else:
                             success, msg, user_obj = register_user(reg_name, reg_user, reg_pass)
                             if success and user_obj:
+                                sess_token = create_user_session(user_obj.get("username", reg_user))
+                                st.query_params["session"] = sess_token
                                 st.session_state.is_logged_in = True
+                                st.session_state.session_token = sess_token
                                 st.session_state.user_name = user_obj.get("name", reg_name)
                                 st.session_state.username = user_obj.get("username", reg_user)
                                 st.session_state.workspace_view = "📑 Resume Analyzer"
@@ -2209,46 +2260,33 @@ elif st.session_state.workspace_view == "🔑 Login / Account":
                 </div>
                 """, unsafe_allow_html=True)
                 if st.button("🚀 Sign In as Demo User (Alex Morgan)", use_container_width=True, type="primary"):
+                    sess_token = create_user_session("alex_demo")
+                    st.query_params["session"] = sess_token
                     st.session_state.is_logged_in = True
+                    st.session_state.session_token = sess_token
                     st.session_state.user_name = "Alex Morgan"
                     st.session_state.username = "alex_demo"
                     st.session_state.workspace_view = "📑 Resume Analyzer"
                     st.rerun()
                     
     else:
-        # User is already logged in - show full Profile & Session Management Card
-        col_p1, col_p2 = st.columns([1.5, 1], gap="large")
-        with col_p1:
-            st.markdown(f"""
-            <div class="hero-upload-card" style="padding: 24px;">
-                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 18px;">
-                    <div class="brand-logo" style="width: 52px; height: 52px; font-size: 26px; border-radius: 14px;">👤</div>
-                    <div>
-                        <div style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); line-height: 1.2;">
-                            {st.session_state.user_name}
-                        </div>
-                        <div style="font-size: 0.85rem; color: var(--color-accent-pink); font-weight: 600;">
-                            @{st.session_state.username}
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px;">
-                    <div style="background: var(--surface-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
-                        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Account Status</div>
-                        <div style="font-size: 0.95rem; font-weight: 700; color: #10B981; margin-top: 2px;">● Active & Verified</div>
-                    </div>
-                    <div style="background: var(--surface-card); padding: 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
-                        <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Document Privileges</div>
-                        <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-top: 2px;">✓ Uploads Enabled</div>
-                    </div>
-                </div>
-                
-                <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45;">
-                    Your account is currently active. Any resumes you upload (.pdf, .docx, .txt) will be securely processed and linked to your candidate profile name <b>{st.session_state.user_name}</b>.
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+        # User is already logged in - show clean Profile & Session Management Card
+        col_space_l, col_profile_box, col_space_r = st.columns([1, 2.2, 1])
+        with col_profile_box:
+            user_handle = st.session_state.username if ("@" in st.session_state.username) else f"@{st.session_state.username}"
+            st.markdown(f"""<div class="hero-upload-card" style="padding: 24px; margin-bottom: 18px;">
+<div style="display: flex; align-items: center; gap: 16px;">
+<div class="brand-logo" style="width: 52px; height: 52px; font-size: 26px; border-radius: 14px;">👤</div>
+<div>
+<div style="font-size: 1.35rem; font-weight: 800; color: var(--text-main); line-height: 1.2;">
+{st.session_state.user_name}
+</div>
+<div style="font-size: 0.85rem; color: var(--color-accent-pink); font-weight: 600;">
+{user_handle}
+</div>
+</div>
+</div>
+</div>""", unsafe_allow_html=True)
             
             col_a1, col_a2 = st.columns(2)
             with col_a1:
@@ -2256,36 +2294,13 @@ elif st.session_state.workspace_view == "🔑 Login / Account":
                     st.session_state.workspace_view = "📑 Resume Analyzer"
                     st.rerun()
             with col_a2:
-                if st.button("🚪 Sign Out of ResuMetric AI", use_container_width=True):
+                if st.button("🚪 Sign Out of AI Resume Analyzer", use_container_width=True):
+                    if st.session_state.get("session_token"):
+                        destroy_user_session(st.session_state.session_token)
                     st.session_state.is_logged_in = False
                     st.session_state.user_name = ""
                     st.session_state.username = ""
+                    st.session_state.session_token = ""
+                    if "session" in st.query_params:
+                        del st.query_params["session"]
                     st.rerun()
-                    
-        with col_p2:
-            st.markdown("""
-            <div class="feature-discover-card">
-                <h4 style="font-size: 0.95rem; font-weight: 700; margin: 0 0 14px 0; color: var(--text-main);">Security & Features</h4>
-                <div class="feature-row">
-                    <div class="feature-icon-badge">🔒</div>
-                    <div>
-                        <div class="feature-title">Encrypted Storage</div>
-                        <div class="feature-desc">Passwords are salted and stored via secure SHA-256 cryptographic hashing.</div>
-                    </div>
-                </div>
-                <div class="feature-row">
-                    <div class="feature-icon-badge">📄</div>
-                    <div>
-                        <div class="feature-title">Unlimited Document Uploads</div>
-                        <div class="feature-desc">Analyze PDF, Word, and text resumes with instant AST parsing.</div>
-                    </div>
-                </div>
-                <div class="feature-row">
-                    <div class="feature-icon-badge">📊</div>
-                    <div>
-                        <div class="feature-title">Personalized PDF Audits</div>
-                        <div class="feature-desc">All generated reports carry your authenticated candidate name.</div>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)

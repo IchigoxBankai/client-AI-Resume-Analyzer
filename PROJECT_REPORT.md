@@ -1,5 +1,5 @@
 # 📑 ACADEMIC PROJECT REPORT
-## Title: ResuMetric AI — Next-Gen AI Resume Analyzer & Career Intelligence Suite
+## Title: AI Resume Analyzer — Next-Gen AI Resume Analyzer & Career Intelligence Suite
 **Degree:** Bachelor of Science in Computer Science (B.Sc. CS - 3rd Year)  
 **Domain:** Artificial Intelligence, Natural Language Processing (NLP), Information Retrieval  
 
@@ -8,7 +8,7 @@
 ### 1. Abstract
 In today's hyper-competitive software and IT job markets, corporate recruitment systems process thousands of resumes daily using automated Applicant Tracking Systems (ATS). A significant proportion of qualified candidates are screened out due to keyword mismatches, improper formatting, and lack of quantifiable impact statements. 
 
-**ResuMetric AI** is an intelligent, dual-engine software suite designed to solve this problem. It evaluates resumes against industry job descriptions using Natural Language Processing (NLP) techniques, including **TF-IDF (Term Frequency - Inverse Document Frequency)** vectorization, **Cosine Similarity**, and domain-specific skill taxonomy extraction. Furthermore, the system incorporates the **STAR (Situation, Task, Action, Result)** methodology to automatically optimize resume bullet points, generates tailored interview questions using Generative AI (LLMs), and predicts multi-role career compatibility.
+**AI Resume Analyzer** is an intelligent, dual-engine software suite designed to solve this problem. It evaluates resumes against industry job descriptions using Natural Language Processing (NLP) techniques, including **TF-IDF (Term Frequency - Inverse Document Frequency)** vectorization, **Cosine Similarity**, and domain-specific skill taxonomy extraction. Furthermore, the system incorporates the **STAR (Situation, Task, Action, Result)** methodology to automatically optimize resume bullet points, generates tailored interview questions using Generative AI (LLMs), and predicts multi-role career compatibility.
 
 ---
 

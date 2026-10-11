@@ -1,6 +1,6 @@
 """
 auth_manager.py
-Authentication and user profile manager for ResuMetric AI.
+Authentication and user profile manager for AI Resume Analyzer.
 Persists user credentials and display names in sample_data/users.json with secure password hashing.
 """
 
@@ -8,10 +8,12 @@ import os
 import json
 import hashlib
 import re
+import secrets
 from datetime import datetime
 from typing import Dict, Any, Optional, Tuple
 
 USERS_FILE = "sample_data/users.json"
+SESSIONS_FILE = "sample_data/active_sessions.json"
 
 
 def _ensure_users_file():
@@ -71,8 +73,8 @@ def register_user(name: str, username: str, password: str) -> Tuple[bool, str, O
     if len(clean_username) < 3:
         return False, "Username must be at least 3 characters.", None
 
-    if not re.match(r"^[a-zA-Z0-9_.-]+$", clean_username):
-        return False, "Username may only contain letters, numbers, dots, hyphens, and underscores.", None
+    if not re.match(r"^[a-zA-Z0-9_.@-]+$", clean_username):
+        return False, "Username may only contain letters, numbers, @, dots, hyphens, and underscores.", None
 
     if not clean_password:
         return False, "Please enter a password.", None
@@ -118,29 +120,116 @@ def authenticate_user(username: str, password: str) -> Tuple[bool, str, Optional
 
     users = get_all_users()
 
-    if clean_username not in users:
+    # Direct match or flexible '@' prefix matching
+    matched_key = None
+    if clean_username in users:
+        matched_key = clean_username
+    elif clean_username.startswith("@") and clean_username[1:] in users:
+        matched_key = clean_username[1:]
+    elif f"@{clean_username}" in users:
+        matched_key = f"@{clean_username}"
+
+    if not matched_key:
         return False, "Username not found. Please create an account or verify your spelling.", None
 
-    user = users[clean_username]
+    user = users[matched_key]
     if user.get("password_hash") != hash_password(clean_password):
         return False, "Incorrect password. Please try again.", None
 
     return True, "Signed in successfully!", {
-        "name": user.get("name", clean_username),
-        "username": clean_username,
+        "name": user.get("name", matched_key),
+        "username": matched_key,
         "created_at": user.get("created_at", "")
     }
 
 
 def get_user_profile(username: str) -> Optional[Dict[str, Any]]:
     """Fetches user details excluding sensitive password hash."""
-    users = get_all_users()
     clean_username = username.strip().lower()
-    if clean_username in users:
-        u = users[clean_username]
+    if clean_username in ["alex_demo", "alex morgan", "demo"]:
         return {
-            "name": u.get("name", clean_username),
-            "username": clean_username,
+            "name": "Alex Morgan",
+            "username": "alex_demo",
+            "created_at": "Academic Demo"
+        }
+
+    users = get_all_users()
+    matched_key = None
+    if clean_username in users:
+        matched_key = clean_username
+    elif clean_username.startswith("@") and clean_username[1:] in users:
+        matched_key = clean_username[1:]
+    elif f"@{clean_username}" in users:
+        matched_key = f"@{clean_username}"
+
+    if matched_key:
+        u = users[matched_key]
+        return {
+            "name": u.get("name", matched_key),
+            "username": matched_key,
             "created_at": u.get("created_at", "")
         }
     return None
+
+
+def _ensure_sessions_file():
+    """Ensures that the active sessions storage file exists."""
+    os.makedirs(os.path.dirname(SESSIONS_FILE), exist_ok=True)
+    if not os.path.exists(SESSIONS_FILE):
+        with open(SESSIONS_FILE, "w", encoding="utf-8") as f:
+            json.dump({}, f, indent=2)
+
+
+def _get_all_sessions() -> Dict[str, Dict[str, Any]]:
+    """Loads all active persisted session tokens."""
+    _ensure_sessions_file()
+    try:
+        with open(SESSIONS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def _save_sessions(sessions: Dict[str, Dict[str, Any]]) -> bool:
+    """Saves active session tokens to disk."""
+    _ensure_sessions_file()
+    try:
+        with open(SESSIONS_FILE, "w", encoding="utf-8") as f:
+            json.dump(sessions, f, indent=2)
+        return True
+    except Exception:
+        return False
+
+
+def create_user_session(username: str) -> str:
+    """Creates and persists an authentication session token for the user."""
+    sessions = _get_all_sessions()
+    token = secrets.token_urlsafe(24)
+    sessions[token] = {
+        "username": username.strip().lower(),
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M")
+    }
+    _save_sessions(sessions)
+    return token
+
+
+def verify_user_session(token: str) -> Optional[Dict[str, Any]]:
+    """Validates session token and returns user profile if active."""
+    if not token or not isinstance(token, str):
+        return None
+    sessions = _get_all_sessions()
+    sess = sessions.get(token)
+    if sess:
+        username = sess.get("username", "")
+        return get_user_profile(username)
+    return None
+
+
+def destroy_user_session(token: str):
+    """Deletes and invalidates a session token upon user logout."""
+    if not token or not isinstance(token, str):
+        return
+    sessions = _get_all_sessions()
+    if token in sessions:
+        del sessions[token]
+        _save_sessions(sessions)

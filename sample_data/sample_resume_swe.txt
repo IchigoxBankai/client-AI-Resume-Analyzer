@@ -23,7 +23,7 @@ Full-Stack Developer Intern | CloudTech Solutions (June 2023 - Present)
 • Collaborated in an agile scrum team of 8 engineers, participating in bi-weekly sprints and daily standups.
 
 ACADEMIC PROJECTS
-1. ResuMetric AI - Intelligent Career & ATS Analyzer
+1. AI Resume Analyzer - Intelligent Career & ATS Analyzer
 • Developed an NLP-driven resume parsing and job description matching system using Python, Scikit-Learn (TF-IDF), and Streamlit.
 • Implemented cosine similarity algorithms to calculate match scores and detect missing skill gaps with 94% accuracy.
 • Integrated Google Gemini Generative AI for automated STAR-method resume bullet point rewriting.

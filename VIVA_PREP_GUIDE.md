@@ -1,10 +1,10 @@
 # 🎓 BSc Computer Science Viva-Voce Preparation Guide
-## Project: ResuMetric AI — Resume Analyzer & Career Intelligence Suite
+## Project: AI Resume Analyzer — Resume Analyzer & Career Intelligence Suite
 
 ---
 
 ### Q1: What is the main objective of this project?
-**Answer:** The objective of ResuMetric AI is to automate the analysis and scoring of resumes against target job descriptions using NLP and AI techniques. It mimics modern Applicant Tracking Systems (ATS) by calculating semantic similarity, detecting skill gaps, scoring action verbs and quantifiable metrics, and offering AI-driven STAR-method bullet optimizations.
+**Answer:** The objective of AI Resume Analyzer is to automate the analysis and scoring of resumes against target job descriptions using NLP and AI techniques. It mimics modern Applicant Tracking Systems (ATS) by calculating semantic similarity, detecting skill gaps, scoring action verbs and quantifiable metrics, and offering AI-driven STAR-method bullet optimizations.
 
 ---
 

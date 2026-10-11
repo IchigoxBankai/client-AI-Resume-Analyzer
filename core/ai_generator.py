@@ -93,7 +93,7 @@ Return strictly in valid JSON format:
     v2 = f"{power_verb} {cleaned}, delivering 99.8% operational uptime and supporting 10,000+ daily active requests."
     
     return {
-        "engine": "ResuMetric Intelligent NLP Engine ⚡",
+        "engine": "AI Resume Analyzer Intelligent NLP Engine ⚡",
         "strong_version": v1,
         "quantified_version": v2,
         "star_breakdown": f"Action Verb ({power_verb}) + Task Context + Measurable Result (Scale metrics)."
@@ -170,7 +170,7 @@ Return strictly in valid JSON format:
         explanation = f"Aligned phrasing directly with competencies required for {target_role}."
 
     return {
-        "engine": "ResuMetric Intelligent NLP Engine ⚡",
+        "engine": "AI Resume Analyzer Intelligent NLP Engine ⚡",
         "improved_text": improved,
         "explanation": explanation,
         "key_changes": [

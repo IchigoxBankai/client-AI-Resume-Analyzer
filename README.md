@@ -1,4 +1,4 @@
-# ⚡ ResuMetric AI — Next-Gen AI Resume Analyzer & Career Intelligence Suite
+# ⚡ AI Resume Analyzer — Next-Gen AI Resume Analyzer & Career Intelligence Suite
 > **BSc Computer Science 3rd Year Final Project Submission**  
 > *A high-performance AI & NLP-driven system for automated Applicant Tracking System (ATS) scoring, STAR-method bullet optimization, skill gap roadmapping, career fit prediction, and mock interview preparation.*
 

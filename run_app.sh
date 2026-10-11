@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "========================================================"
-echo "      ResuMetric AI - Resume Analyzer & Career Suite"
+echo "      AI Resume Analyzer - Resume Analyzer & Career Suite"
 echo "      BSc Computer Science Final Year Project"
 echo "========================================================"
 echo ""

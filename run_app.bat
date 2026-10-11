@@ -1,7 +1,7 @@
 @echo off
-title ResuMetric AI - Resume Analyzer
+title AI Resume Analyzer - Resume Analyzer
 echo ========================================================
-echo       ResuMetric AI - Resume Analyzer & Career Suite
+echo       AI Resume Analyzer - Resume Analyzer & Career Suite
 echo       BSc Computer Science Final Year Project
 echo ========================================================
 echo.
@@ -14,7 +14,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo [2/2] Launching ResuMetric AI Streamlit Server...
+echo [2/2] Launching AI Resume Analyzer Streamlit Server...
 echo Opening in default browser at http://localhost:8501
 streamlit run app.py
 pause
